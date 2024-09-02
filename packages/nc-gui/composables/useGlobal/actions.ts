@@ -8,10 +8,13 @@ export function useGlobalActions(state: State): Actions {
   }
 
   /** Sign out by deleting the token from localStorage */
-  const signOut: Actions['signOut'] = async (_skipRedirect = false) => {
+  const signOut: Actions['signOut'] = async (_skipRedirect = false, skipApiCall = false) => {
     try {
-      const nuxtApp = useNuxtApp()
-      await nuxtApp.$api.auth.signout()
+      // call and invalidate refresh token only if user manually triggered logout
+      if (!skipApiCall) {
+        const nuxtApp = useNuxtApp()
+        await nuxtApp.$api.auth.signout()
+      }
     } catch {
     } finally {
       state.token.value = null
@@ -64,7 +67,7 @@ export function useGlobalActions(state: State): Actions {
         })
         .catch(async () => {
           if (state.token.value && state.user.value) {
-            await signOut()
+            await signOut(undefined, true)
             message.error(t('msg.error.youHaveBeenSignedOut'))
           }
         })
