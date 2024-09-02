@@ -24,7 +24,7 @@ services:
           memory: 1000M      
   
   postgres:
-    image: postgres:14.7
+    image: postgres:16.4
     container_name: postgres
     restart: unless-stopped
     env_file:
