@@ -27,27 +27,6 @@ jobs:
         run: |
           sed -i '/^use-node-version/d' .npmrc
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-      - uses: actions/cache@v3
-        name: Setup pnpm cache
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Cache pkg modules
-        id: cache-pkg
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-pkg
-        with:
-          # pkg cache files are stored in `~/.pkg-cache`
-          path: ~/.pkg-cache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
 
       # for building images for all platforms these libraries are required in Linux
       - name: Install QEMU and ldid
@@ -134,111 +113,8 @@ jobs:
           npx --yes pkg@5.8.1 . --compress GZip -t node18-win-arm64 -o Noco-win-arm64.exe
           mv ./Noco-win-arm64.exe ./dist/
 
-      - name: Upload executables to asset
-        id: upload-release-asset
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          draft: true
-          tag_name: ${{ github.event.inputs.tag || inputs.tag }}
-          files: |
-             ./scripts/pkg-executable/dist/Noco-win-arm64.exe
-             ./scripts/pkg-executable/dist/Noco-win-x64.exe
-             ./scripts/pkg-executable/dist/Noco-linux-arm64
-             ./scripts/pkg-executable/dist/Noco-linux-x64
-
       - uses: actions/upload-artifact@master
         with:
           name: ${{ github.event.inputs.tag || inputs.tag }}
           path: scripts/pkg-executable/mac-dist
           retention-days: 1
-  sign-mac-executables:
-    runs-on: macos-latest
-    needs: build-executables
-    steps:
-
-      - uses: actions/download-artifact@master
-        with:
-          name: ${{ github.event.inputs.tag || inputs.tag }}
-          path: scripts/pkg-executable/mac-dist
-
-      - name: Sign macOS executables
-        run: |
-          /usr/bin/codesign --force -s - ./scripts/pkg-executable/mac-dist/Noco-macos-arm64 -v
-          /usr/bin/codesign --force -s - ./scripts/pkg-executable/mac-dist/Noco-macos-x64 -v
-
-      - uses: actions/upload-artifact@master
-        with:
-          name: ${{ format('{0}-signed', github.event.inputs.tag || inputs.tag) }}
-          path: scripts/pkg-executable/mac-dist
-          retention-days: 1
-
-
-  publish-mac-executables-and-homebrew:
-    needs: [sign-mac-executables,build-executables]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@master
-        with:
-          name: ${{ format('{0}-signed', github.event.inputs.tag || inputs.tag) }}
-          path: scripts/pkg-executable/mac-dist
-
-
-
-      - uses: actions/checkout@v3
-        with:
-          path: 'homebrew-nocodb'
-          token: ${{ secrets.NC_GITHUB_TOKEN }}
-          repository: 'nocodb/homebrew-nocodb'
-          fetch-depth: 0
-
-      - name: Compress files and calculate checksum
-        run: |
-          cd ./scripts/pkg-executable
-          cp ./mac-dist/Noco-macos-x64 ./mac-dist/nocodb
-          tar -czf ./mac-dist/nocodb.tar.gz ./mac-dist/nocodb
-          rm ./mac-dist/nocodb
-          echo "CHECKSUM=$(shasum -a 256 ./mac-dist/nocodb.tar.gz | awk '{print $1}')" >> $GITHUB_OUTPUT
-        id: compress
-
-
-      - name: Upload macos executable to asset
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          draft: true
-          tag_name: ${{ github.event.inputs.tag || inputs.tag }}
-          files: |
-            ./scripts/pkg-executable/mac-dist/Noco-macos-x64
-            ./scripts/pkg-executable/mac-dist/Noco-macos-arm64
-            ./scripts/pkg-executable/mac-dist/nocodb.tar.gz
-
-      - name: Generate Homebrew Formula class and push
-        run: |
-          FORMULA_CLASS_STR=$(cat << EOF
-          class Nocodb < Formula
-            desc "NocoDB : Opensource smart spreadsheet"
-            homepage "https://github.com/nocodb/nocodb"
-            url "https://github.com/nocodb/nocodb/releases/download/${{ github.event.inputs.tag || inputs.tag }}/nocodb.tar.gz"
-            sha256 "${{ steps.compress.outputs.CHECKSUM }}"
-            license "MIT"
-            version "${{ github.event.inputs.tag || inputs.tag }}"
-
-            def install
-              bin.install "nocodb"
-            end
-          end
-          EOF
-          )
-
-          cd ./homebrew-nocodb
-
-          printf "$FORMULA_CLASS_STR" > ./Formula/nocodb.rb
-
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
-
-          git commit ./Formula/nocodb.rb -m "Automatic publish"
-          git push
