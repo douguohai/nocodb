@@ -83,7 +83,6 @@ onMounted(() => {
           {{ $t('title.teamAndSettings') }}
         </h1>
       </div>
-      <SmartsheetTopbarCmdK />
     </div>
     <template v-else>
       <div class="nc-breadcrumb px-2">

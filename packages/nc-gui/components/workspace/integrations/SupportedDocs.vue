@@ -1,17 +1,6 @@
 <script lang="ts" setup>
 const supportedDocs = [
-  {
-    title: 'Integrations',
-    href: 'https://docs.nocodb.com/category/integrations',
-  },
-  {
-    title: 'Create new connection',
-    href: 'https://docs.nocodb.com/integrations/create-connection',
-  },
-  {
-    title: 'Add new Data source',
-    href: 'https://docs.nocodb.com/data-sources/connect-to-data-source',
-  },
+
 ] as {
   title: string
   href: string

@@ -58,7 +58,6 @@ onBeforeMount(() => {
         </h1>
       </div>
 
-      <SmartsheetTopbarCmdK />
     </div>
     <NcTabs v-model:activeKey="activeViewTab">
       <template #leftExtra>

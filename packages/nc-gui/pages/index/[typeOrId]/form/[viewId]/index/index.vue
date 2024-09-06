@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import type { ColumnType } from 'nocodb-sdk'
-import { RelationTypes, UITypes, isVirtualCol } from 'nocodb-sdk'
-import { ref } from 'vue'
-import { StreamBarcodeReader } from 'vue-barcode-reader'
+import type {ColumnType} from 'nocodb-sdk'
+import {RelationTypes, UITypes, isVirtualCol} from 'nocodb-sdk'
+import {ref} from 'vue'
+import {StreamBarcodeReader} from 'vue-barcode-reader'
 
 const {
   sharedFormView,
@@ -20,14 +20,14 @@ const {
   fieldMappings,
 } = useSharedFormStoreOrThrow()
 
-const { isMobileMode } = storeToRefs(useConfigStore())
+const {isMobileMode} = storeToRefs(useConfigStore())
 
 function isRequired(_columnObj: Record<string, any>, required = false) {
   let columnObj = _columnObj
   if (
-    columnObj.uidt === UITypes.LinkToAnotherRecord &&
-    columnObj.colOptions &&
-    columnObj.colOptions.type === RelationTypes.BELONGS_TO
+      columnObj.uidt === UITypes.LinkToAnotherRecord &&
+      columnObj.colOptions &&
+      columnObj.colOptions.type === RelationTypes.BELONGS_TO
   ) {
     columnObj = formColumns.value?.find((c) => c.id === columnObj.colOptions.fk_child_column_id) as Record<string, any>
   }
@@ -71,7 +71,7 @@ const onDecode = async (scannedCodeValue: string) => {
       throw new Error(`Field with title ${fieldTitleForCurrentScan.value} not found`)
     }
     const transformedVal =
-      getScannedValueTransformerByFieldType(fieldForCurrentScan.uidt as UITypes)(scannedCodeValue) || scannedCodeValue
+        getScannedValueTransformerByFieldType(fieldForCurrentScan.uidt as UITypes)(scannedCodeValue) || scannedCodeValue
     formState.value[fieldTitleForCurrentScan.value] = transformedVal
     fieldTitleForCurrentScan.value = ''
     showCodeScannerOverlay.value = false
@@ -94,20 +94,43 @@ const validateField = async (title: string) => {
     return false
   }
 }
+
+const {getPossibleAttachmentSrc} = useAttachment()
+
+const getFormLogoSrc = computed(() => getPossibleAttachmentSrc(parseProp(sharedFormView.value?.logo_url)))
+
 </script>
 
 <template>
   <div class="h-full flex flex-col items-center w-full max-w-[max(33%,688px)] mx-auto">
     <GeneralFormBanner
-      v-if="sharedFormView && !parseProp(sharedFormView?.meta).hide_banner"
-      :banner-image-url="sharedFormView.banner_image_url"
-      class="flex-none dark:border-none"
+        v-if="sharedFormView && !parseProp(sharedFormView?.meta).hide_banner"
+        :banner-image-url="sharedFormView.banner_image_url"
+        class="flex-none dark:border-none"
     />
 
     <div
-      class="transition-all duration-300 ease-in relative flex flex-col justify-center gap-2 w-full my-6 bg-white dark:bg-transparent rounded-3xl border-1 border-gray-200 px-4 py-8 lg:p-12 md:(p-8 dark:bg-slate-700)"
+        class="transition-all duration-300 ease-in relative flex flex-col justify-center gap-2 w-full my-6 bg-white dark:bg-transparent rounded-3xl border-1 border-gray-200 px-4 py-8 lg:p-12 md:(p-8 dark:bg-slate-700)"
     >
       <template v-if="sharedFormView">
+
+        <div
+            class="nc-form-logo-wrapper  group relative inline-block h-56px overflow-hidden flex items-center"
+            :class="
+                              sharedFormView.logo_url
+                                ? 'max-w-189px  '
+                                : 'bg-gray-100 max-w-147px rounded-xl'
+                            "
+            style="transition: all 0.3s ease-in"
+        >
+          <LazyCellAttachmentPreviewImage
+              v-if="sharedFormView.logo_url"
+              :key="sharedFormView.logo_url?.path"
+              :srcs="getFormLogoSrc"
+              class="flex-none nc-form-logo !object-contain object-left max-h-full max-w-full !m-0"
+          />
+        </div>
+
         <div>
           <h1 class="text-2xl font-bold text-gray-900 mb-4">
             {{ sharedFormView.heading }}
@@ -115,40 +138,41 @@ const validateField = async (title: string) => {
 
           <div v-if="sharedFormView.subheading">
             <LazyCellRichText
-              :value="sharedFormView.subheading"
-              class="font-medium text-base text-gray-500 dark:text-slate-300 !h-auto mb-4 -ml-1"
-              is-form-field
-              read-only
-              sync-value-change
+                :value="sharedFormView.subheading"
+                class="font-medium text-base text-gray-500 dark:text-slate-300 !h-auto mb-4 -ml-1"
+                is-form-field
+                read-only
+                sync-value-change
             />
           </div>
         </div>
 
-        <a-alert v-if="notFound" type="warning" class="!mt-2 !mb-4 text-center" message="Not found" />
+        <a-alert v-if="notFound" type="warning" class="!mt-2 !mb-4 text-center" message="Not found"/>
 
         <template v-else-if="submitted">
           <div class="flex justify-center">
             <div v-if="sharedFormView" class="w-full">
-              <a-alert class="nc-shared-form-success-msg !mt-2 !mb-4 !py-4 text-left !rounded-lg" type="success" outlined>
+              <a-alert class="nc-shared-form-success-msg !mt-2 !mb-4 !py-4 text-left !rounded-lg" type="success"
+                       outlined>
                 <template #message>
                   <LazyCellRichText
-                    v-if="sharedFormView?.success_msg?.trim()"
-                    :value="sharedFormView?.success_msg"
-                    class="!h-auto -ml-1"
-                    is-form-field
-                    read-only
-                    sync-value-change
+                      v-if="sharedFormView?.success_msg?.trim()"
+                      :value="sharedFormView?.success_msg"
+                      class="!h-auto -ml-1"
+                      is-form-field
+                      read-only
+                      sync-value-change
                   />
                   <span v-else> {{ $t('msg.successfullySubmittedFormData') }} </span>
                 </template>
               </a-alert>
 
               <div
-                v-if="
+                  v-if="
                   typeof sharedFormView?.redirect_url !== 'string' &&
                   (sharedFormView.show_blank_form || sharedFormView.submit_another_form)
                 "
-                class="mt-16 w-full flex justify-between items-center flex-wrap gap-3"
+                  class="mt-16 w-full flex justify-between items-center flex-wrap gap-3"
               >
                 <p v-if="sharedFormView?.show_blank_form" class="text-sm text-gray-500 dark:text-slate-300 m-0">
                   {{ $t('labels.newFormLoaded') }} {{ secondsRemain }} {{ $t('general.seconds').toLowerCase() }}
@@ -156,10 +180,10 @@ const validateField = async (title: string) => {
 
                 <div class="flex-1 self-end flex justify-end">
                   <NcButton
-                    v-if="sharedFormView?.submit_another_form"
-                    type="secondary"
-                    :size="isMobileMode ? 'medium' : 'small'"
-                    @click="submitted = false"
+                      v-if="sharedFormView?.submit_another_form"
+                      type="secondary"
+                      :size="isMobileMode ? 'medium' : 'small'"
+                      @click="submitted = false"
                   >
                     {{ $t('activity.submitAnotherForm') }}
                   </NcButton>
@@ -171,22 +195,22 @@ const validateField = async (title: string) => {
 
         <template v-else>
           <a-modal
-            v-model:visible="showCodeScannerOverlay"
-            :closable="false"
-            width="28rem"
-            centered
-            :footer="null"
-            wrap-class-name="nc-modal-generate-token"
-            destroy-on-close
-            @cancel="scannerIsReady = false"
+              v-model:visible="showCodeScannerOverlay"
+              :closable="false"
+              width="28rem"
+              centered
+              :footer="null"
+              wrap-class-name="nc-modal-generate-token"
+              destroy-on-close
+              @cancel="scannerIsReady = false"
           >
             <div class="relative flex flex-col h-full">
-              <StreamBarcodeReader v-show="scannerIsReady" @decode="onDecode" @loaded="onLoaded"> </StreamBarcodeReader>
+              <StreamBarcodeReader v-show="scannerIsReady" @decode="onDecode" @loaded="onLoaded"></StreamBarcodeReader>
             </div>
           </a-modal>
           <GeneralOverlay class="bg-gray-50/75 rounded-3xl" :model-value="isLoading" inline transition>
             <div class="w-full h-full flex items-center justify-center">
-              <a-spin size="large" />
+              <a-spin size="large"/>
             </div>
           </GeneralOverlay>
 
@@ -195,10 +219,10 @@ const validateField = async (title: string) => {
               <div class="nc-form h-full">
                 <div class="flex flex-col gap-3 md:gap-6">
                   <div
-                    v-for="(field, index) in formColumns"
-                    :key="index"
-                    class="flex flex-col gap-2"
-                    :data-testid="`nc-shared-form-item-${field.title?.replace(' ', '')}`"
+                      v-for="(field, index) in formColumns"
+                      :key="index"
+                      class="flex flex-col gap-2"
+                      :data-testid="`nc-shared-form-item-${field.title?.replace(' ', '')}`"
                   >
                     <div class="nc-form-column-label text-sm font-semibold text-gray-800">
                       <span>
@@ -208,60 +232,60 @@ const validateField = async (title: string) => {
                     </div>
                     <div v-if="field?.description" class="nc-form-column-description text-gray-500 text-sm">
                       <LazyCellRichText
-                        :value="field?.description"
-                        class="!h-auto -ml-1"
-                        is-form-field
-                        read-only
-                        sync-value-change
+                          :value="field?.description"
+                          class="!h-auto -ml-1"
+                          is-form-field
+                          read-only
+                          sync-value-change
                       />
                     </div>
 
                     <div>
                       <NcTooltip :disabled="!field?.read_only">
-                        <template #title> {{ $t('activity.preFilledFields.lockedFieldTooltip') }} </template>
+                        <template #title> {{ $t('activity.preFilledFields.lockedFieldTooltip') }}</template>
                         <a-form-item
-                          v-if="field.title && fieldMappings[field.title]"
-                          :name="fieldMappings[field.title]"
-                          class="!my-0 nc-input-required-error"
-                          v-bind="validateInfos[fieldMappings[field.title]]"
+                            v-if="field.title && fieldMappings[field.title]"
+                            :name="fieldMappings[field.title]"
+                            class="!my-0 nc-input-required-error"
+                            v-bind="validateInfos[fieldMappings[field.title]]"
                         >
                           <LazySmartsheetDivDataCell class="flex relative">
                             <LazySmartsheetVirtualCell
-                              v-if="isVirtualCol(field)"
-                              :model-value="null"
-                              class="mt-0 nc-input nc-cell"
-                              :data-testid="`nc-form-input-cell-${field.label || field.title}`"
-                              :class="[`nc-form-input-${field.title?.replaceAll(' ', '')}`, { readonly: field?.read_only }]"
-                              :column="field"
-                              :read-only="field?.read_only"
+                                v-if="isVirtualCol(field)"
+                                :model-value="null"
+                                class="mt-0 nc-input nc-cell"
+                                :data-testid="`nc-form-input-cell-${field.label || field.title}`"
+                                :class="[`nc-form-input-${field.title?.replaceAll(' ', '')}`, { readonly: field?.read_only }]"
+                                :column="field"
+                                :read-only="field?.read_only"
                             />
 
                             <LazySmartsheetCell
-                              v-else
-                              v-model="formState[field.title]"
-                              class="nc-input truncate"
-                              :data-testid="`nc-form-input-cell-${field.label || field.title}`"
-                              :class="[
+                                v-else
+                                v-model="formState[field.title]"
+                                class="nc-input truncate"
+                                :data-testid="`nc-form-input-cell-${field.label || field.title}`"
+                                :class="[
                                 `nc-form-input-${field.title?.replaceAll(' ', '')}`,
                                 { 'layout-list': parseProp(field?.meta)?.isList, 'readonly': field?.read_only },
                               ]"
-                              :column="field"
-                              :edit-enabled="!field?.read_only"
-                              :read-only="field?.read_only"
-                              @update:model-value="
+                                :column="field"
+                                :edit-enabled="!field?.read_only"
+                                :read-only="field?.read_only"
+                                @update:model-value="
                                 () => {
                                   validateField(field.title)
                                 }
                               "
                             />
                             <a-button
-                              v-if="field.enable_scanner"
-                              class="nc-btn-fill-form-column-by-scan nc-toolbar-btn"
-                              :alt="$t('activity.fillByCodeScan')"
-                              @click="showCodeScannerForFieldTitle(field.title)"
+                                v-if="field.enable_scanner"
+                                class="nc-btn-fill-form-column-by-scan nc-toolbar-btn"
+                                :alt="$t('activity.fillByCodeScan')"
+                                @click="showCodeScannerForFieldTitle(field.title)"
                             >
                               <div class="flex items-center gap-1">
-                                <component :is="iconMap.qrCodeScan" class="h-5 w-5" />
+                                <component :is="iconMap.qrCodeScan" class="h-5 w-5"/>
                               </div>
                             </a-button>
                           </LazySmartsheetDivDataCell>
@@ -273,24 +297,24 @@ const validateField = async (title: string) => {
 
                 <div class="flex justify-between items-center mt-6">
                   <NcButton
-                    html-type="reset"
-                    type="secondary"
-                    :size="isMobileMode ? 'medium' : 'small'"
-                    :disabled="isLoading"
-                    class="nc-shared-form-button shared-form-clear-button"
-                    data-testid="shared-form-clear-button"
-                    @click="clearForm"
+                      html-type="reset"
+                      type="secondary"
+                      :size="isMobileMode ? 'medium' : 'small'"
+                      :disabled="isLoading"
+                      class="nc-shared-form-button shared-form-clear-button"
+                      data-testid="shared-form-clear-button"
+                      @click="clearForm"
                   >
                     {{ $t('activity.clearForm') }}
                   </NcButton>
 
                   <NcButton
-                    :disabled="progress"
-                    type="primary"
-                    :size="isMobileMode ? 'medium' : 'small'"
-                    class="nc-shared-form-button shared-form-submit-button"
-                    data-testid="shared-form-submit-button"
-                    @click="submitForm"
+                      :disabled="progress"
+                      type="primary"
+                      :size="isMobileMode ? 'medium' : 'small'"
+                      class="nc-shared-form-button shared-form-submit-button"
+                      data-testid="shared-form-submit-button"
+                      @click="submitForm"
                   >
                     {{ $t('general.submit') }}
                   </NcButton>
@@ -299,9 +323,9 @@ const validateField = async (title: string) => {
             </a-form>
           </div>
           <div>
-            <a-divider class="!my-6 !md:my-8" />
+            <a-divider class="!my-6 !md:my-8"/>
             <div class="inline-block">
-              <GeneralFormBranding />
+              <GeneralFormBranding v-if="sharedFormView && !parseProp(sharedFormView?.meta).hide_branding"/>
             </div>
           </div>
         </template>
@@ -315,6 +339,7 @@ const validateField = async (title: string) => {
 :deep(.nc-cell .nc-action-icon) {
   @apply !text-white-500 !bg-white/50 !rounded-full !p-1 !text-xs !w-7 !h-7 !flex !items-center !justify-center !cursor-pointer !hover: !bg-white-600 !hover: !text-white-600 !transition;
 }
+
 .nc-btn-fill-form-column-by-scan {
   @apply h-auto;
   @apply ml-1;
@@ -329,6 +354,7 @@ const validateField = async (title: string) => {
 .nc-input-required-error {
   max-width: 100%;
   white-space: pre-line;
+
   :deep(.ant-form-item-explain-error) {
     &:first-child {
       @apply mt-2;
@@ -345,6 +371,7 @@ const validateField = async (title: string) => {
 :deep(.ant-form-item-has-error .ant-select:not(.ant-select-disabled) .ant-select-selector) {
   border: none !important;
 }
+
 :deep(.ant-form-item-has-success .ant-select:not(.ant-select-disabled) .ant-select-selector) {
   border: none !important;
 }

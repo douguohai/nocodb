@@ -512,14 +512,7 @@ const isCalendarReadonly = (calendarRange?: Array<{ fk_from_column_id: string; f
             </template>
           </template>
         </div>
-        <a
-          v-if="!form.copy_from_id"
-          class="text-sm !text-gray-600 !font-default !hover:text-gray-600"
-          :href="`https://docs.nocodb.com/views/view-types/${typeAlias}`"
-          target="_blank"
-        >
-          Docs
-        </a>
+
       </div>
     </template>
     <div class="mt-1">

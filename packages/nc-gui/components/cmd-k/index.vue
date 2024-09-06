@@ -235,31 +235,7 @@ const fireAction = (action: CmdAction, preview = false) => {
   }
 }
 
-whenever(keys.ctrl_k, () => {
-  show()
-})
-
-whenever(keys.meta_k, () => {
-  show()
-})
-
 whenever(keys.Escape, () => {
-  if (vOpen.value) hide()
-})
-
-whenever(keys.ctrl_l, () => {
-  if (vOpen.value) hide()
-})
-
-whenever(keys.meta_l, () => {
-  if (vOpen.value) hide()
-})
-
-whenever(keys.ctrl_j, () => {
-  if (vOpen.value) hide()
-})
-
-whenever(keys.meta_j, () => {
   if (vOpen.value) hide()
 })
 

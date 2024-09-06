@@ -141,31 +141,7 @@ const isPending = computed(() => !emailConfigured.value || !storageConfigured.va
                   <div class="select-none">{{ $t('title.auditLogs') }}</div>
                 </div>
               </NcMenuItem>
-              <NcMenuItem
-                v-if="isUIAllowed('superAdminAppStore') && !isEeUI"
-                key="apps"
-                class="item w-full"
-                :class="{
-                  active: $route.params.page === 'apps',
-                }"
-                @click="navigateTo('/account/apps')"
-              >
-                <div class="flex items-center gap-2 w-full">
-                  <component :is="iconMap.appStore" />
 
-                  <div class="select-none text-sm">{{ $t('title.appStore') }}</div>
-                  <span class="flex-grow" />
-                  <NcToolti>
-                    <template #title>
-                      <span>
-                        App store will soon be removed. Email & Storage plugins are now available in Accounts/Setup page. Rest of
-                        the plugins here will be moved to integrations.
-                      </span>
-                    </template>
-                    <GeneralIcon icon="ncAlertCircle" class="text-orange-500 w-4 h-4 nc-pending" />
-                  </NcToolti>
-                </div>
-              </NcMenuItem>
               <a-sub-menu key="users" class="!bg-white !my-0">
                 <template #icon>
                   <GeneralIcon icon="users" class="!h-3.5 !w-3.5" />

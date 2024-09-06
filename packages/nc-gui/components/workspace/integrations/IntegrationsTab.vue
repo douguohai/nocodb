@@ -175,39 +175,7 @@ const handleAddIntegration = (category: IntegrationCategoryType, integration: In
             'h-full': !isModal,
           }"
         >
-          <div v-if="integrationListContainerWidth" class="px-6 pt-6">
-            <div
-              class="flex items-end justify-end flex-wrap gap-3 m-auto"
-              :style="{
-                maxWidth: listWrapperMaxWidth,
-              }"
-            >
-              <div class="flex-1">
-                <div class="text-sm font-normal text-gray-600 mb-2">
-                  <div>
-                    Connect integrations with NocoDB.
-                    <a href="https://docs.nocodb.com/category/integrations" target="_blank" rel="noopener noreferrer"
-                      >Learn more</a
-                    >
-                  </div>
-                </div>
-                <a-input
-                  v-model:value="searchQuery"
-                  type="text"
-                  class="nc-input-border-on-value nc-search-integration-input !min-w-[300px] !max-w-[400px] nc-input-sm flex-none"
-                  placeholder="Search integration"
-                  allow-clear
-                >
-                  <template #prefix>
-                    <GeneralIcon icon="search" class="mr-2 h-4 w-4 text-gray-500" />
-                  </template>
-                </a-input>
-              </div>
-              <NcButton type="ghost" size="small" class="!text-primary" @click="requestIntegration.isOpen = true">
-                Request Integration
-              </NcButton>
-            </div>
-          </div>
+          <div v-if="integrationListContainerWidth" class="px-6 pt-6" />
 
           <div
             ref="integrationListRef"

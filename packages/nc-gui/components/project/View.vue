@@ -128,8 +128,6 @@ watch(
         </div>
       </div>
 
-      <SmartsheetTopbarCmdK v-if="!isSharedBase" />
-
       <LazyGeneralShareProject />
     </div>
     <div
