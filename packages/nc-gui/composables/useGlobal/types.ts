@@ -80,9 +80,16 @@ export interface Getters {
   isLoading: WritableComputedRef<boolean>
 }
 
+export interface SignOutParams {
+  redirectToSignin?: boolean
+  signinUrl?: string
+  skipRedirect?: boolean
+  skipApiCall?: boolean
+}
+
 export interface Actions {
-  signOut: (skipRedirect?: boolean) => void
-  signIn: (token: string, keepProps?: boolean) => void
+  signOut: (signOutParams?: SignOutParams) => Promise<void>
+  signIn: (token: string, keepProps?: boolean) => Promise<void>
   refreshToken: () => void
   loadAppInfo: () => void
   setIsMobileMode: (isMobileMode: boolean) => void

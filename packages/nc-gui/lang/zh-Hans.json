@@ -287,7 +287,9 @@
     "connections": "连接",
     "private": "私人",
     "request": "请求",
-    "languages": "语言"
+    "languages": "语言",
+    "extension": "Extension",
+    "extensions": "Extensions"
   },
   "objects": {
     "files": "文件",
@@ -759,7 +761,7 @@
     "icon": "图标",
     "max": "最大",
     "enableRichText": "启用富文本",
-    "idColon": "Id:",
+    "idColon": "Id: {fieldId}",
     "copiedRecordURL": "复制的记录 URL",
     "copyRecordURL": "复制该记录卡片的 URL",
     "duplicateRecord": "复制该行",

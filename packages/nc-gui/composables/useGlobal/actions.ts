@@ -8,14 +8,26 @@ export function useGlobalActions(state: State): Actions {
   }
 
   /** Sign out by deleting the token from localStorage */
-  const signOut: Actions['signOut'] = async (_skipRedirect = false) => {
+  const signOut: Actions['signOut'] = async ({
+    redirectToSignin,
+    signinUrl = '/signin',
+    skipApiCall = false,
+  }: SignOutParams = {}) => {
     try {
-      const nuxtApp = useNuxtApp()
-      await nuxtApp.$api.auth.signout()
+      // call and invalidate refresh token only if user manually triggered logout
+      if (!skipApiCall) {
+        const nuxtApp = useNuxtApp()
+        await nuxtApp.$api.auth.signout()
+      }
     } catch {
+      // ignore error
     } finally {
       state.token.value = null
       state.user.value = null
+
+      if (redirectToSignin) {
+        await navigateTo(signinUrl)
+      }
 
       // clear all stores data on logout
       const pn = getActivePinia()
@@ -64,7 +76,9 @@ export function useGlobalActions(state: State): Actions {
         })
         .catch(async () => {
           if (state.token.value && state.user.value) {
-            await signOut()
+            await signOut({
+              skipApiCall: true,
+            })
             message.error(t('msg.error.youHaveBeenSignedOut'))
           }
         })
