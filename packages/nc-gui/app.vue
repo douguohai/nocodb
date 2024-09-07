@@ -144,7 +144,7 @@ const _ = (window as any).ResizeObserver
       <!-- Recent Views. Cycles through recently visited Views -->
       <CmdL v-model:open="cmdL" :set-active-cmd-view="setActiveCmdView" />
       <!-- Documentation. Integrated NocoDB Docs directly inside the Product -->
-      <CmdJ />
+      <!--  <CmdJ /> -->
     </div>
   </ErrorBoundary>
 </template>

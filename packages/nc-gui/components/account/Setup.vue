@@ -96,20 +96,6 @@ onMounted(async () => {
           <div class="text-gray-600 text-sm">{{ config.description }}</div>
 
           <div class="flex justify-between mt-4">
-            <NcButton
-              size="small"
-              type="text"
-              :href="config.docsLink"
-              target="_blank"
-              class="!flex items-center !no-underline"
-              rel="noopener noreferer"
-              @click.stop
-            >
-              <div class="flex gap-2 items-center">
-                Go to docs
-                <GeneralIcon icon="ncExternalLink" />
-              </div>
-            </NcButton>
             <NcButton v-if="config.configured" size="small" type="text" @click.stop="config.buttonClick">
               <div class="flex gap-2 items-center">
                 <GeneralIcon icon="ncEdit3" />
