@@ -19,7 +19,7 @@ deploy-dev: # This job runs in the build stage, which runs first.
   before_script: [ ]
   script:
     - echo "start Installing dependencies"
-    - pnpm bootstrap
+    - nvm use 18 && pnpm bootstrap
     - export NODE_OPTIONS="--max_old_space_size=16384" && cd packages/nc-gui && pnpm run generate
     - rsync -rvzh --delete ./dist/ ../nocodb/docker/nc-gui
     - echo "start Build nocodb, package nocodb-sdk and nc-gui"
