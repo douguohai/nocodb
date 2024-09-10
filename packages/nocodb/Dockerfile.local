@@ -3,7 +3,7 @@
 ###########
 # Builder
 ###########
-FROM node:18.19.1-alpine as builder
+FROM 192.168.10.239:8888/charles0320/node:18.19.1-alpine as builder
 WORKDIR /usr/src/app
 
 # install node-gyp dependencies
@@ -35,7 +35,7 @@ RUN pnpm install --prod --shamefully-hoist --reporter=silent \
 ##########
 # Runner
 ##########
-FROM alpine:3.19
+FROM 192.168.10.239:8888/charles0320/alpine:3.19
 WORKDIR /usr/src/app
 
 ENV NC_DOCKER=0.6 \
