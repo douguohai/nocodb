@@ -1,7 +1,7 @@
 variables:
   RemoteUrlB: swr.cn-east-3.myhuaweicloud.com/ssstianmin
   DingToken: 1e336794c4b90331ba4999dc6188fd4820808952d046cd6657f7797ecca54107
-  ProjectName: nocdb
+  ProjectName: Nocdb-私有版本
 stages: # List of stages for jobs, and their order of execution
   - deploy-dev
 
@@ -29,7 +29,7 @@ deploy-dev: # This job runs in the build stage, which runs first.
     - echo "start Building docker image"
     - TIMESTAMP=$(date +%Y-%m-%d-%H%M%S) # 使用date命令将时间戳转换为Unix时间戳
     - RemoteImageName="${RemoteUrl}/${BaseImage}:${AppRunEnv}-${TIMESTAMP}"
-    - docker build . -f Dockerfile.local -t RemoteImageName
+    - docker build . -f Dockerfile.local -t ${RemoteImageName}
     - docker push "${RemoteImageName}"
     - docker rmi "${RemoteImageName}"
     - noticejob image -e ${AppRunEnv} -v ${TIMESTAMP} -n ${ProjectName} -t ${DingToken} -u "${RemoteImageName}"
