@@ -32,4 +32,5 @@ deploy-dev: # This job runs in the build stage, which runs first.
     - docker build . -f Dockerfile.local -t ${RemoteImageName}
     - docker push "${RemoteImageName}"
     - docker rmi "${RemoteImageName}"
+    - cd ../../
     - noticejob image -e ${AppRunEnv} -v ${TIMESTAMP} -n ${ProjectName} -t ${DingToken} -u "${RemoteImageName}"
