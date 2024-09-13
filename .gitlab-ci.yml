@@ -29,7 +29,8 @@ deploy-dev: # This job runs in the build stage, which runs first.
     - echo "start Building docker image"
     - TIMESTAMP=$(date +%Y-%m-%d-%H%M%S) # 使用date命令将时间戳转换为Unix时间戳
     - RemoteImageName="${RemoteUrl}/${BaseImage}:${AppRunEnv}-${TIMESTAMP}"
-    - docker build . -f Dockerfile.local -t ${RemoteImageName}
+#    - docker build . -f Dockerfile.local -t ${RemoteImageName}
+    - docker buildx build --platform linux/arm,linux/arm64,linux/amd64 -f Dockerfile -t ${RemoteImageName} . --push || ERROR="build_image failed"
     - docker push "${RemoteImageName}"
     - docker rmi "${RemoteImageName}"
     - cd ../../
